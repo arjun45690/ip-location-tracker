@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+</head>
+<body>
+    <h1>Welcome to My Page</h1>
+    <p>Click the button to share your location!</p>
+    <button id="getLocation">Share Location</button>
+
+    <script>
+        // Get IP Address
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                const ip = data.ip;
+                console.log('IP Address:', ip);
+
+                // Now let's get the location
+                document.getElementById('getLocation').addEventListener('click', () => {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                                const latitude = position.coords.latitude;
+                                const longitude = position.coords.longitude;
+
+                                // Log the IP and location data
+                                fetch('https://your-backend-url.com/log', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        ip: ip,
+                                        latitude: latitude,
+                                        longitude: longitude
+                                    }),
+                                }).then(response => {
+                                    alert('Location and IP sent!');
+                                }).catch(error => {
+                                    console.error('Error sending data:', error);
+                                });
+                            },
+                            (error) => {
+                                alert('Unable to retrieve your location.');
+                            }
+                        );
+                    } else {
+                        alert('Geolocation is not supported by this browser.');
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error getting IP:', error);
+            });
+    </script>
+</body>
+</html>
